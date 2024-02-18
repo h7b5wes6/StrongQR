@@ -1,0 +1,2 @@
+# StrongQR
+beta.v001
