@@ -1,0 +1,262 @@
+ <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>StrongQR</title>
+        <!-- Подключение библиотеки Bootstrap для стилей -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <!-- Подключение шрифта Montserrat из Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+        <!-- Подключение библиотеки Font Awesome для иконок -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <!-- Подключение Darkmode.js -->
+        <script src="https://cdn.jsdelivr.net/npm/darkmode-js"></script>
+        <style>
+          body {
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            background-color: #f8f9fa;
+            transition: background-color 0.3s;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            transition: background-color 0.3s; /* Добавил transition для плавного изменения фона */
+          }
+          .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            transition: background-color 0.3s; /* Добавил transition для плавного изменения фона */
+          }
+          .card-header {
+            background-color: #4e73df;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+          }
+          .card-body {
+            padding: 20px;
+          }
+          .form-group {
+            margin-bottom: 20px;
+          }
+          .form-control {
+            border-radius: 5px;
+            padding: 12px 15px;
+            font-size: 16px;
+          }
+          .btn-primary {
+            background-color: #4e73df;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: background-color 0.3s;
+          }
+          .btn-primary:hover {
+            background-color: #375aba;
+          }
+          #qr-code {
+            text-align: center;
+            margin-top: 20px;
+          }
+          #qr-code img {
+            max-width: 100%;
+            height: auto;
+          }
+          .privacy-policy {
+            text-align: center;
+            margin-top: 20px;
+            color: #666; /* Добавил цвет текста */
+          }
+          .privacy-policy a {
+            color: #4e73df;
+            text-decoration: none;
+          }
+          .privacy-policy a:hover {
+            text-decoration: underline;
+          }
+          .custom-control-label::before,
+          .custom-control-label::after {
+            top: 2px;
+          }
+          .dark-mode-switch-label {
+            color: #4e73df;
+          }
+          .range-value {
+            color: #4e73df;
+            font-weight: bold;
+          }
+          .dark-mode {
+            background-color: #222; /* Изменение цвета фона в темном режиме */
+            color: #fff; /* Изменение цвета текста в темном режиме */
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="card">
+            <div class="card-header">
+              StrongQR
+            </div>
+            <div class="card-body">
+              <form id="login-form">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="login-input" name="login-input" placeholder="Логин">
+                </div>
+                <div class="form-group">
+                  <div class="input-group">
+                    <input type="password" class="form-control" id="password-input" name="password-input" placeholder="Пароль">
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary" type="button" id="toggle-password"><i class="far fa-eye"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <button type="button" class="btn btn-primary" onclick="generateQRCode()">Сгенерировать QR-код</button>
+                </div>
+                <div class="form-group range-container">
+                  <label for="password-length">Длина пароля:</label>
+                  <input type="range" class="form-control-range" id="password-length" name="password-length" min="8" max="64" value="12">
+                  <output class="range-value" id="password-length-output">12</output>
+                </div>
+                <div class="form-group">
+                  <label for="password-options">Параметры пароля:</label>
+                  <select class="form-control" id="password-options" multiple>
+                    <option value="include-uppercase" selected>Включать заглавные буквы</option>
+                    <option value="include-lowercase" selected>Включать строчные буквы</option>
+                    <option value="include-numbers" selected>Включать цифры</option>
+                    <option value="include-symbols">Включать специальные символы</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="dark-mode-switch">
+                    <label class="custom-control-label dark-mode-switch-label" for="dark-mode-switch">Темный режим</label>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div id="qr-code"></div>
+          <div class="privacy-policy">
+            <p>© 2024 StrongQR. Все права защищены. <a href="privacy-policy.html">Политика конфиденциальности</a></p> <a
+            href="terms-of-service.html">Условия
+            использования</а>
+    </div>
+  </div>
+  <!-- Подключение библиотеки для генерации QR-кода -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script>
+    function generateQRCode() {
+      var login = document.getElementById('login-input').value.trim();
+      var password = document.getElementById('password-input').value.trim();
+      if (login !== '' && password !== '') {
+        var text = "StrongQR\nLogin: " + login + "\nPassword: " + password;
+        var qrCodeDiv = document.getElementById('qr-code');
+        qrCodeDiv.innerHTML = ''; // Очищаем содержимое div перед добавлением нового QR-кода
+        var qr = qrcode(0, 'H');
+        qr.addData(text);
+        qr.make();
+        qrCodeDiv.innerHTML = qr.createImgTag(5); // Размер QR-кода
+        appendDownloadButton(qr.createImgTag(5)); // Исправлено, добавлен вызов с правильным параметром
+      } else {
+        alert('Введите логин и пароль перед генерацией QR-кода.');
+      }
+    }
+
+    function appendDownloadButton(qrCodeImgTag) {
+      var qrCodeDiv = document.getElementById('qr-code');
+      var downloadButton = document.createElement('button');
+      downloadButton.type = 'button';
+      downloadButton.className = 'btn btn-success mt-3';
+      downloadButton.textContent = 'Скачать QR-код';
+      downloadButton.onclick = function() {
+        downloadQRCode(qrCodeImgTag);
+      };
+      qrCodeDiv.appendChild(downloadButton);
+    }
+
+    function downloadQRCode(qrCodeImgTag) {
+      var qrCodeDiv = document.createElement('div');
+      qrCodeDiv.innerHTML = qrCodeImgTag;
+      var qrCodeImage = qrCodeDiv.querySelector('img');
+      if (qrCodeImage) {
+        var link = document.createElement('a');
+        link.href = qrCodeImage.src;
+        link.download = 'qr_code.png';
+        link.click();
+      } else {
+        alert('Ошибка при скачивании QR-кода.');
+      }
+    }
+
+    // Функция для отображения/скрытия пароля
+    document.getElementById('toggle-password').addEventListener('click', function() {
+      var passwordInput = document.getElementById('password-input');
+      var icon = this.querySelector('i');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('far', 'fa-eye');
+        icon.classList.add('fas', 'fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fas', 'fa-eye-slash');
+        icon.classList.add('far', 'fa-eye');
+      }
+    });
+
+    // Обновление значения длины пароля при движении ползунка
+    document.getElementById('password-length').addEventListener('input', function() {
+      var length = parseInt(this.value);
+      document.getElementById('password-length-output').innerHTML = length;
+      generateSecurePassword(); // добавлена функция генерации безопасного пароля
+    });
+
+    function generateSecurePassword() {
+      var length = parseInt(document.getElementById('password-length').value);
+      var options = document.getElementById('password-options').selectedOptions;
+      var charset = '';
+      for (var i = 0; i < options.length; i++) {
+        if (options[i].value === 'include-uppercase') charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        if (options[i].value === 'include-lowercase') charset += 'abcdefghijklmnopqrstuvwxyz';
+        if (options[i].value === 'include-numbers') charset += '0123456789';
+        if (options[i].value === 'include-symbols') charset += '!@#$%^&*()-_=+';
+      }
+      var securePassword = '';
+      for (var i = 0; i < length; i++) {
+        securePassword += charset.charAt(Math.floor(Math.random() * charset.length));
+      }
+      document.getElementById('password-input').value = securePassword;
+      document.getElementById('password-length-output').innerHTML = length;
+    }
+  // Функция для переключения темного режима
+    function toggleDarkMode() {
+      var darkModeSwitch = document.getElementById('dark-mode-switch');
+      var container = document.querySelector('.container');
+      var cards = document.querySelectorAll('.card');
+      if (darkModeSwitch.checked) {
+        document.body.classList.add('dark-mode');
+        container.classList.add('dark-mode');
+        cards.forEach(card => card.classList.add('dark-mode'));
+      } else {
+        document.body.classList.remove('dark-mode');
+        container.classList.remove('dark-mode');
+        cards.forEach(card => card.classList.remove('dark-mode'));
+      }
+    }
+
+    document.getElementById('dark-mode-switch').addEventListener('change', toggleDarkMode);
+  </script>
+</body>
+</html>
